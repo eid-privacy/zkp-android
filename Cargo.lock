@@ -5094,6 +5094,7 @@ dependencies = [
  "anyhow",
  "mopro-ffi",
  "noir",
+ "noirc_abi",
  "serde",
  "serde-wasm-bindgen",
  "serde_json",

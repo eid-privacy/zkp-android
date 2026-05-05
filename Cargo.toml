@@ -29,7 +29,7 @@ noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", featur
     "barretenberg",
     "android-compat",
 ], branch = "v1.0.0-beta.8-3" }
-    
+noirc_abi = { git = "https://github.com/noir-lang/noir.git", rev = "b33131574388d836341cea9b6380f3b1a8493eb8" }
 
 [build-dependencies]
 # CIRCOM_BUILD_DEPENDENCIES
