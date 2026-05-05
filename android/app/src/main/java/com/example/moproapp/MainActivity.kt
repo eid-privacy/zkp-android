@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Circom", "Halo2", "Noir")
+    val tabs = listOf("Noir")
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(modifier = Modifier
@@ -69,9 +69,7 @@ fun MainScreen() {
             }
             Spacer(modifier = Modifier.height(16.dp))
             when (selectedTab) {
-                0 -> MultiplierComponent()
-                1 -> FibonacciComponent()
-                2 -> NoirComponent()
+                0 -> NoirComponent()
             }
         }
     }

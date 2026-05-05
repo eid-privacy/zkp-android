@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.json.JSONArray
 import org.json.JSONObject
 import uniffi.mopro.generateNoirProof
 import uniffi.mopro.verifyNoirProof
@@ -41,23 +42,31 @@ fun NoirComponent() {
     var isVerifyingProof by remember { mutableStateOf(false) }
     var statusMessage by remember { mutableStateOf("Ready to generate proof") }
 
-    val circuitFile = getFilePathFromAssets("noir_multiplier2.json")
-    val srsFile = getFilePathFromAssets("noir_multiplier2.srs")
-    
-    // Load existing verification key from assets
-    val existingVk = remember {
-        try {
-            context.assets.open("noir_multiplier2.vk").readBytes()
-        } catch (e: Exception) {
-            null
-        }
-    }
+    val circuitFile = getFilePathFromAssets("noir_c03_holder_binding.json")
+    val srsFile = getFilePathFromAssets("noir_c03_holder_binding.srs")
 
+    // Build the JSON input for the HolderBinding circuit
+    val circuitInputJson = remember {
+        val json = JSONObject()
+        json.put("credential_string", "Alice                           Smith                           09583416008caa0593dfd6510b118188f28e623eec9ffb719a4ecbc689a19d7de57b2a8182876001d8323c4a4cd8991c1cea15d4dbc12b463ac7b6d1e906c294c68f1766f70000000000134a37")
+
+        val signatureDevice = JSONArray()
+        listOf(171, 194, 24, 110, 235, 188, 255, 0, 116, 193, 34, 12, 208, 148, 158, 205, 151, 28, 248, 111, 202, 38, 199, 141, 79, 156, 109, 12, 29, 34, 145, 2, 94, 91, 197, 154, 1, 195, 92, 33, 10, 251, 17, 202, 101, 53, 119, 226, 18, 31, 60, 80, 244, 59, 167, 219, 61, 41, 116, 98, 34, 34, 134, 240)
+            .forEach { signatureDevice.put(it) }
+        json.put("signature_device", signatureDevice)
+
+        val challengeHash = JSONArray()
+        listOf(0, 138, 146, 177, 229, 156, 197, 31, 176, 9, 150, 122, 223, 240, 132, 57, 241, 241, 99, 238, 181, 138, 146, 139, 55, 61, 55, 61, 150, 81, 25, 39)
+            .forEach { challengeHash.put(it) }
+        json.put("challenge_hash", challengeHash)
+
+        json.toString()
+    }
 
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Noir Multiplier2",
+                text = "Noir Holder Binding",
                 modifier = Modifier.padding(bottom = 20.dp),
                 fontWeight = FontWeight.Bold,
                 fontSize = 22.sp
@@ -89,15 +98,13 @@ fun NoirComponent() {
                     Thread(
                         Runnable {
                             try {
-                                val inputs = listOf("3", "5")
                                 val onChain = true  // Use Keccak for Solidity compatibility
                                 val lowMemoryMode = false
+                                val circuit = "HolderBinding"
 
-                                // First, get or use existing verification key
-                                val vk = existingVk ?: run {
-                                    statusMessage = "Generating verification key..."
-                                    getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
-                                }
+                                // Generate verification key (circuit changed, so pre-generated VK is unreliable)
+                                statusMessage = "Generating verification key..."
+                                val vk = getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
                                 verificationKey = vk
 
                                 statusMessage = "Generating proof with verification key..."
@@ -105,10 +112,11 @@ fun NoirComponent() {
                                 proofBytes = generateNoirProof(
                                     circuitFile,
                                     srsFile,
-                                    inputs,
+                                    circuitInputJson,
                                     onChain,
                                     vk,
-                                    lowMemoryMode
+                                    lowMemoryMode,
+                                    circuit
                                 )
                                 val endTime = System.currentTimeMillis()
                                 val duration = endTime - startTime

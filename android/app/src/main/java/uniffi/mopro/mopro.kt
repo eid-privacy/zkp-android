@@ -674,7 +674,7 @@ internal object UniffiLib {
     ): RustBuffer.ByValue
     external fun uniffi_zkp_android_fn_func_verify_halo2_proof(`srsPath`: RustBuffer.ByValue,`vkPath`: RustBuffer.ByValue,`proof`: RustBuffer.ByValue,`publicInput`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Byte
-    external fun uniffi_zkp_android_fn_func_generate_noir_proof(`circuitPath`: RustBuffer.ByValue,`srsPath`: RustBuffer.ByValue,`inputs`: RustBuffer.ByValue,`onChain`: Byte,`vk`: RustBuffer.ByValue,`lowMemoryMode`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_zkp_android_fn_func_generate_noir_proof(`circuitPath`: RustBuffer.ByValue,`srsPath`: RustBuffer.ByValue,`input`: RustBuffer.ByValue,`onChain`: Byte,`vk`: RustBuffer.ByValue,`lowMemoryMode`: Byte,`circuit`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
     external fun uniffi_zkp_android_fn_func_get_noir_verification_key(`circuitPath`: RustBuffer.ByValue,`srsPath`: RustBuffer.ByValue,`onChain`: Byte,`lowMemoryMode`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
@@ -814,7 +814,7 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zkp_android_checksum_func_verify_halo2_proof() != 52354.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_zkp_android_checksum_func_generate_noir_proof() != 45517.toShort()) {
+    if (lib.uniffi_zkp_android_checksum_func_generate_noir_proof() != 13842.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zkp_android_checksum_func_get_noir_verification_key() != 23797.toShort()) {
@@ -1533,12 +1533,12 @@ public object FfiConverterMapStringSequenceString: FfiConverterRustBuffer<Map<ko
          * - `on_chain = true`: Uses Keccak hash for Solidity verifier compatibility
          * - `on_chain = false`: Uses Poseidon hash for better performance
          */
-    @Throws(MoproException::class) fun `generateNoirProof`(`circuitPath`: kotlin.String, `srsPath`: kotlin.String?, `inputs`: List<kotlin.String>, `onChain`: kotlin.Boolean, `vk`: kotlin.ByteArray, `lowMemoryMode`: kotlin.Boolean): kotlin.ByteArray {
+    @Throws(MoproException::class) fun `generateNoirProof`(`circuitPath`: kotlin.String, `srsPath`: kotlin.String?, `input`: kotlin.String, `onChain`: kotlin.Boolean, `vk`: kotlin.ByteArray, `lowMemoryMode`: kotlin.Boolean, `circuit`: kotlin.String): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     uniffiRustCallWithError(MoproException) { _status ->
     UniffiLib.uniffi_zkp_android_fn_func_generate_noir_proof(
     
-        FfiConverterString.lower(`circuitPath`),FfiConverterOptionalString.lower(`srsPath`),FfiConverterSequenceString.lower(`inputs`),FfiConverterBoolean.lower(`onChain`),FfiConverterByteArray.lower(`vk`),FfiConverterBoolean.lower(`lowMemoryMode`),_status)
+        FfiConverterString.lower(`circuitPath`),FfiConverterOptionalString.lower(`srsPath`),FfiConverterString.lower(`input`),FfiConverterBoolean.lower(`onChain`),FfiConverterByteArray.lower(`vk`),FfiConverterBoolean.lower(`lowMemoryMode`),FfiConverterString.lower(`circuit`),_status)
 }
     )
     }
