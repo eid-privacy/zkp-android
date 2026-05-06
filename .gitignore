@@ -1,3 +1,4 @@
 /target
 test-vectors/noir/noir_c03_holder_binding.srs
 android/app/src/main/assets/noir_c03_holder_binding.srs
+build/
