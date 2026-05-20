@@ -32,10 +32,7 @@ pub fn generate_noir_proof(
     low_memory_mode: bool,
     circuit: &str,
 ) -> Result<Vec<u8>, MoproError> {
-    let abi = match circuit {
-        "HolderBinding" => Ok(get_holder_binding_abi()),
-        _ => Err("unknown circuit type"),
-    }.unwrap();
+    let abi = get_circuit_abi(circuit);
     let witness = build_witness(&input, abi).unwrap();
     let res = if on_chain {
         generate_noir_proof_with_keccak(circuit_path, srs_path, witness, false, vk, low_memory_mode)
@@ -227,6 +224,13 @@ fn get_bytecode(circuit_path: String) -> String {
     let circuit: serde_json::Value = serde_json::from_str(&circuit_txt).unwrap();
 
     circuit["bytecode"].as_str().unwrap().to_string()
+}
+
+fn get_circuit_abi(circuit: &str) -> Result<Abi, String> {
+    match circuit {
+        "HolderBinding" => Ok(get_holder_binding_abi()),
+        _ => Err("unknown circuit type".to_string()),
+    }
 }
 
 pub fn get_holder_binding_abi() -> Abi {
