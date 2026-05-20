@@ -268,7 +268,6 @@ pub fn build_witness(
 mod tests {
     const HOLDER_BINDING_CIRCUIT_FILE: &str = "./test-vectors/noir/noir_c03_holder_binding.json";
     const HOLDER_BINDING_SRS_FILE: &str = "./test-vectors/noir/noir_c03_holder_binding.srs";
-    const HOLDER_BINDING_VK_FILE: &str = "./test-vectors/noir/noir_c03_holder_binding.vk";
 
     const CREDENTIAL_STRING: &str = "Alice                           Smith                           09583416008caa0593dfd6510b118188f28e623eec9ffb719a4ecbc689a19d7de57b2a8182876001d8323c4a4cd8991c1cea15d4dbc12b463ac7b6d1e906c294c68f1766f70000000000134a37";
     const SIGNATURE_DEVICE: [u8; 64] = [171, 194, 24, 110, 235, 188, 255, 0, 116, 193, 34, 12, 208, 148, 158, 205, 151, 28, 248, 111, 202, 38, 199, 141, 79, 156, 109, 12, 29, 34, 145, 2, 94, 91, 197, 154, 1, 195, 92, 33, 10, 251, 17, 202, 101, 53, 119, 226, 18, 31, 60, 80, 244, 59, 167, 219, 61, 41, 116, 98, 34, 34, 134, 240];

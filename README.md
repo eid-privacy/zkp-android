@@ -46,7 +46,6 @@ mopro update
 cd zkp-pocs/noir/;
 make
 cp c03_holder_binding/target/c03_holder_binding.json ../../zkp-android/test-vectors/noir/noir_c03_holder_binding.json
-cp proofs/c03_holder_binding/vk ../../zkp-android/test-vectors/noir/noir_c03_holder_binding.vk
 ```
 
 ```sh
