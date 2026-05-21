@@ -27,6 +27,10 @@ import uniffi.mopro.getNoirVerificationKey
 import java.io.File
 import java.io.InputStream
 
+const val CREDENTIAL_STRING = "Alice                           Smith                           095834160096ae308132a110a2fdc6cd3b68658102d43a45cdd6d758586b4ad63b92dc221d4f08d8067c51d7b1a4a814e5eff0e389fb7f23110965f406286cd8e5eadac03e0000000000134a37"
+val SIGNATURE_DEVICE = listOf(158, 220, 195, 163, 254, 53, 31, 79, 93, 163, 186, 252, 237, 103, 156, 223, 136, 147, 82, 111, 23, 40, 119, 72, 193, 19, 195, 44, 205, 224, 216, 21, 89, 85, 244, 178, 26, 139, 114, 226, 168, 180, 27, 10, 172, 160, 163, 102, 37, 212, 141, 92, 74, 210, 230, 158, 155, 70, 227, 32, 219, 110, 231, 152)
+val CHALLENGE_HASH = listOf(32, 40, 248, 44, 225, 214, 0, 161, 197, 113, 178, 102, 73, 82, 63, 107, 176, 196, 21, 63, 254, 173, 161, 2, 166, 207, 60, 95, 239, 86, 9, 61)
+
 @Composable
 fun NoirComponent() {
     val context = LocalContext.current
@@ -48,16 +52,14 @@ fun NoirComponent() {
     // Build the JSON input for the HolderBinding circuit
     val circuitInputJson = remember {
         val json = JSONObject()
-        json.put("credential_string", "Alice                           Smith                           09583416008caa0593dfd6510b118188f28e623eec9ffb719a4ecbc689a19d7de57b2a8182876001d8323c4a4cd8991c1cea15d4dbc12b463ac7b6d1e906c294c68f1766f70000000000134a37")
+        json.put("credential_string", CREDENTIAL_STRING)
 
         val signatureDevice = JSONArray()
-        listOf(171, 194, 24, 110, 235, 188, 255, 0, 116, 193, 34, 12, 208, 148, 158, 205, 151, 28, 248, 111, 202, 38, 199, 141, 79, 156, 109, 12, 29, 34, 145, 2, 94, 91, 197, 154, 1, 195, 92, 33, 10, 251, 17, 202, 101, 53, 119, 226, 18, 31, 60, 80, 244, 59, 167, 219, 61, 41, 116, 98, 34, 34, 134, 240)
-            .forEach { signatureDevice.put(it) }
+        SIGNATURE_DEVICE.forEach { signatureDevice.put(it) }
         json.put("signature_device", signatureDevice)
 
         val challengeHash = JSONArray()
-        listOf(0, 138, 146, 177, 229, 156, 197, 31, 176, 9, 150, 122, 223, 240, 132, 57, 241, 241, 99, 238, 181, 138, 146, 139, 55, 61, 55, 61, 150, 81, 25, 39)
-            .forEach { challengeHash.put(it) }
+        CHALLENGE_HASH.forEach { challengeHash.put(it) }
         json.put("challenge_hash", challengeHash)
 
         json.toString()
