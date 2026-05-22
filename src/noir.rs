@@ -233,7 +233,7 @@ fn get_circuit_abi(circuit: &str) -> Result<Abi, String> {
         "AgeVerification" => Ok(get_age_verification_abi()),
         "NonRevocation" => Ok(get_non_revocation_abi()),
         "FullProof" => Ok(get_full_proof_abi()),
-        _ => Err("unknown circuit type".to_string()),
+        _ => Err(format!("unknown circuit type: {circuit}")),
     }
 }
 

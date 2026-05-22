@@ -63,19 +63,6 @@ class ExampleInstrumentedTest {
         composeTestRule.onNodeWithTag("circomVerifyProofButton").assertIsDisplayed()
     }
 
-    @Test 
-    fun noirButtonClick() {
-        composeTestRule.setContent { NoirComponent() }
-
-        composeTestRule.onNodeWithTag("noirGenerateProofButton").performClick()
-        composeTestRule.onNodeWithTag("noirGenerateProofButton").assertIsDisplayed()
-
-        waitForProofCompletion("noirVerifyProofButton", maxWaitSeconds = 10)
-
-        composeTestRule.onNodeWithTag("noirVerifyProofButton").performClick()
-        composeTestRule.onNodeWithTag("noirVerifyProofButton").assertIsDisplayed()
-    }
-
     @Test
     fun rapidsnarkButtonClick() {
         composeTestRule.setContent { MultiplierComponent() }
@@ -100,5 +87,70 @@ class ExampleInstrumentedTest {
 
         composeTestRule.onNodeWithTag("halo2VerifyProofButton").performClick()
         composeTestRule.onNodeWithTag("halo2VerifyProofButton").assertIsDisplayed()
+    }
+
+    @Test 
+    fun HolderBindingButtonClick() {
+        composeTestRule.setContent { HolderBindingComponent() }
+
+        composeTestRule.onNodeWithTag("holderBindingGenerateProofButton").performClick()
+        composeTestRule.onNodeWithTag("holderBindingGenerateProofButton").assertIsDisplayed()
+
+        waitForProofCompletion("holderBindingVerifyProofButton", maxWaitSeconds = 10)
+
+        composeTestRule.onNodeWithTag("holderBindingVerifyProofButton").performClick()
+        composeTestRule.onNodeWithTag("holderBindingVerifyProofButton").assertIsDisplayed()
+    }
+
+    @Test
+    fun issuerSignatureButtonClick() {
+        composeTestRule.setContent { IssuerSignatureComponent() }
+
+        composeTestRule.onNodeWithTag("issuerSignatureGenerateProofButton").performClick()
+        composeTestRule.onNodeWithTag("issuerSignatureGenerateProofButton").assertIsDisplayed()
+
+        waitForProofCompletion("issuerSignatureVerifyProofButton", maxWaitSeconds = 10)
+
+        composeTestRule.onNodeWithTag("issuerSignatureVerifyProofButton").performClick()
+        composeTestRule.onNodeWithTag("issuerSignatureVerifyProofButton").assertIsDisplayed()
+    }
+
+    @Test
+    fun ageVerificationButtonClick() {
+        composeTestRule.setContent { AgeVerificationComponent() }
+
+        composeTestRule.onNodeWithTag("ageVerificationGenerateProofButton").performClick()
+        composeTestRule.onNodeWithTag("ageVerificationGenerateProofButton").assertIsDisplayed()
+
+        waitForProofCompletion("ageVerificationVerifyProofButton", maxWaitSeconds = 10)
+
+        composeTestRule.onNodeWithTag("ageVerificationVerifyProofButton").performClick()
+        composeTestRule.onNodeWithTag("ageVerificationVerifyProofButton").assertIsDisplayed()
+    }
+
+    @Test
+    fun nonRevocationButtonClick() {
+        composeTestRule.setContent { NonRevocationComponent() }
+
+        composeTestRule.onNodeWithTag("nonRevocationGenerateProofButton").performClick()
+        composeTestRule.onNodeWithTag("nonRevocationGenerateProofButton").assertIsDisplayed()
+
+        waitForProofCompletion("nonRevocationVerifyProofButton", maxWaitSeconds = 10)
+
+        composeTestRule.onNodeWithTag("nonRevocationVerifyProofButton").performClick()
+        composeTestRule.onNodeWithTag("nonRevocationVerifyProofButton").assertIsDisplayed()
+    }
+
+    @Test
+    fun fullProofButtonClick() {
+        composeTestRule.setContent { FullProofComponent() }
+
+        composeTestRule.onNodeWithTag("fullProofGenerateProofButton").performClick()
+        composeTestRule.onNodeWithTag("fullProofGenerateProofButton").assertIsDisplayed()
+
+        waitForProofCompletion("fullProofVerifyProofButton", maxWaitSeconds = 10)
+
+        composeTestRule.onNodeWithTag("fullProofVerifyProofButton").performClick()
+        composeTestRule.onNodeWithTag("fullProofVerifyProofButton").assertIsDisplayed()
     }
 }

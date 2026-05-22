@@ -1,0 +1,54 @@
+{
+  "noir_version": "1.0.0-beta.8+ba05d729b9753aa5ce2b076c1dd4795edb173f68",
+  "hash": "6126033448798159096",
+  "abi": {
+    "parameters": [
+      {
+        "name": "credential_string",
+        "type": {
+          "kind": "string",
+          "length": 218
+        },
+        "visibility": "private"
+      },
+      {
+        "name": "current_date",
+        "type": {
+          "kind": "integer",
+          "sign": "unsigned",
+          "width": 64
+        },
+        "visibility": "public"
+      }
+    ],
+    "return_type": null,
+    "error_types": {
+      "2920182694213909827": {
+        "error_kind": "string",
+        "string": "attempt to subtract with overflow"
+      },
+      "5019202896831570965": {
+        "error_kind": "string",
+        "string": "attempt to add with overflow"
+      },
+      "7233212735005103307": {
+        "error_kind": "string",
+        "string": "attempt to multiply with overflow"
+      }
+    }
+  },
+  "bytecode": "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",
+  "debug_symbols": "pZRBboMwEEXv4jULY3tmSK5SVREhToRkAXKgUhXl7h3Cp00W3ZDVA/z/4CdZvplTPE6XQ9ud+6vZf9zMMbcptZdD6pt6bPtOv97uhVlfD2OOUT+Zp3VtDXWO3Wj23ZRSYb7qND1C16HuHhzrrKu2MLE7KXXguU1xfroXf237f9WHtRys/63Tln5pt/QtrX0nb/W9o/f+v2n/IfDaly37J+vQJ+829MWX6AuXL/1PfaubNr+cOOPKnUoXxjkLlrr1mQ70Wp8ZQEKOQUGuAndLzluwXHLegX7J+QAScgwKchW4W3LBguWSCw70Sy4EkJBjUJCrQPgSfAm+BF+CL8GX4EvwJfgSfAm+DF+GL8OX4cvwZfgyfBm+DF+Gr8BX4CvwFfgKfEXn8UwGBaxAnSfKyoI6r5rpQA/qvOo+H6zc1scUcR+dp655up7G72FdWS+wIfdNPE05zgfrsaZH7Qc=",
+  "file_map": {
+    "50": {
+      "source": "use eid::constants;\n\nfn main(\n    // Private input\n    credential_string: str<constants::CREDENTIAL_LEN>,\n    // Public input\n    current_date: pub u64,\n) {\n    // Calculate the age in seconds\n    let mut birth_timestamp: u64 = 0;\n    for i in 0..constants::CREDENTIAL_LEN_DOB {\n        birth_timestamp = birth_timestamp * 10\n            + credential_string.as_bytes()[i + constants::CREDENTIAL_POS_DOB] as u64\n            - 48;\n    }\n    assert(birth_timestamp <= current_date);\n    let age_seconds = current_date - birth_timestamp;\n\n    // Ignoring leap years and check against 18 years of duration: 365.25 * 24 * 3600 = 31,557,600\n    let seconds_per_year = 31557600;\n    let min_age_seconds = 18 * seconds_per_year;\n    assert(age_seconds >= min_age_seconds);\n}\n",
+      "path": "/home/cdengler/src/eid-privacy/zkp-pocs/noir/c05_age_verification/src/main.nr"
+    }
+  },
+  "names": [
+    "main"
+  ],
+  "brillig_names": [
+    "directive_integer_quotient"
+  ]
+}
