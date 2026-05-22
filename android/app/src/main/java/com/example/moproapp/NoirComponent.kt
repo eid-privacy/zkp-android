@@ -151,6 +151,73 @@ fun HolderBindingComponent() {
 
             Button(
                 onClick = {
+                    isGeneratingProof = true
+                    provingTime = ""
+                    proofResult = ""
+                    statusMessage = "Generating proof... This may take some time"
+
+                    Thread(
+                        Runnable {
+                            try {
+                                val onChain = true  // Use Keccak for Solidity compatibility
+                                val lowMemoryMode = false
+                                val circuit = "HolderBinding"
+
+                                statusMessage = "Generating verification key..."
+                                val vk = getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
+                                verificationKey = vk
+
+                                statusMessage = "Benchmarking proof generation with verification key..."
+                                var totalDuration = 0L
+                                var bestDuration = 0L
+                                var worstDuration = 0L
+                                for (i in 0 until 100) {
+                                    statusMessage = "Run ${i + 1} of 100"
+
+                                    val startTime = System.currentTimeMillis()
+                                    proofBytes = generateNoirProof(
+                                        circuitFile,
+                                        srsFile,
+                                        circuitInputJson,
+                                        onChain,
+                                        vk,
+                                        lowMemoryMode,
+                                        circuit
+                                    )
+                                    val endTime = System.currentTimeMillis()
+                                    val duration = endTime - startTime
+                                    if ((bestDuration == 0L) || (duration < bestDuration)) bestDuration = duration
+                                    if ((worstDuration == 0L) || (worstDuration < duration)) worstDuration = duration
+                                    totalDuration += duration
+                                    println("Run ${i + 1} of 100 proving time: $duration ms")
+                                }
+                                val averageDuration = totalDuration / 100
+                                provingTime = "Proving time: $averageDuration ms (average of 100 runs)"
+                                println("Proving time: $averageDuration ms (average of 100 runs)")
+                                println("Best proving time: $bestDuration ms (average of 100 runs)")
+                                println("Worst proving time: $worstDuration ms (average of 100 runs)")
+                                statusMessage = "Proof generation completed"
+                            } catch (e: Exception) {
+                                provingTime = "Benchmarking failed"
+                                proofResult = "Error: ${e.message}"
+                                statusMessage = "Benchmarking proof generation failed"
+                                e.printStackTrace()
+                            } finally {
+                                isGeneratingProof = false
+                            }
+                        }
+                    ).start()
+                },
+                modifier = Modifier.padding(top = 20.dp).testTag("holderBindingBenchmarkProofButton"),
+                enabled = !isGeneratingProof && !isVerifyingProof
+            ) { 
+                Text(text = "Benchmark Proof Generation")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
                     isVerifyingProof = true
                     verificationTime = ""
                     verificationResult = ""
@@ -371,6 +438,73 @@ fun IssuerSignatureComponent() {
 
             Button(
                 onClick = {
+                    isGeneratingProof = true
+                    provingTime = ""
+                    proofResult = ""
+                    statusMessage = "Generating proof... This may take some time"
+
+                    Thread(
+                        Runnable {
+                            try {
+                                val onChain = true  // Use Keccak for Solidity compatibility
+                                val lowMemoryMode = false
+                                val circuit = "IssuerSignature"
+
+                                statusMessage = "Generating verification key..."
+                                val vk = getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
+                                verificationKey = vk
+
+                                statusMessage = "Benchmarking proof generation with verification key..."
+                                var totalDuration = 0L
+                                var bestDuration = 0L
+                                var worstDuration = 0L
+                                for (i in 0 until 100) {
+                                    statusMessage = "Run ${i + 1} of 100"
+
+                                    val startTime = System.currentTimeMillis()
+                                    proofBytes = generateNoirProof(
+                                        circuitFile,
+                                        srsFile,
+                                        circuitInputJson,
+                                        onChain,
+                                        vk,
+                                        lowMemoryMode,
+                                        circuit
+                                    )
+                                    val endTime = System.currentTimeMillis()
+                                    val duration = endTime - startTime
+                                    if ((bestDuration == 0L) || (duration < bestDuration)) bestDuration = duration
+                                    if ((worstDuration == 0L) || (worstDuration < duration)) worstDuration = duration
+                                    totalDuration += duration
+                                    println("Run ${i + 1} of 100 proving time: $duration ms")
+                                }
+                                val averageDuration = totalDuration / 100
+                                provingTime = "Proving time: $averageDuration ms (average of 100 runs)"
+                                println("Proving time: $averageDuration ms (average of 100 runs)")
+                                println("Best proving time: $bestDuration ms (average of 100 runs)")
+                                println("Worst proving time: $worstDuration ms (average of 100 runs)")
+                                statusMessage = "Proof generation completed"
+                            } catch (e: Exception) {
+                                provingTime = "Benchmarking failed"
+                                proofResult = "Error: ${e.message}"
+                                statusMessage = "Benchmarking proof generation failed"
+                                e.printStackTrace()
+                            } finally {
+                                isGeneratingProof = false
+                            }
+                        }
+                    ).start()
+                },
+                modifier = Modifier.padding(top = 20.dp).testTag("issuerSignatureBenchmarkProofButton"),
+                enabled = !isGeneratingProof && !isVerifyingProof
+            ) { 
+                Text(text = "Benchmark Proof Generation")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
                     isVerifyingProof = true
                     verificationTime = ""
                     verificationResult = ""
@@ -572,6 +706,73 @@ fun AgeVerificationComponent() {
                 enabled = !isGeneratingProof && !isVerifyingProof
             ) {
                 Text(text = "Generate Proof")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    isGeneratingProof = true
+                    provingTime = ""
+                    proofResult = ""
+                    statusMessage = "Generating proof... This may take some time"
+
+                    Thread(
+                        Runnable {
+                            try {
+                                val onChain = true  // Use Keccak for Solidity compatibility
+                                val lowMemoryMode = false
+                                val circuit = "AgeVerification"
+
+                                statusMessage = "Generating verification key..."
+                                val vk = getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
+                                verificationKey = vk
+
+                                statusMessage = "Benchmarking proof generation with verification key..."
+                                var totalDuration = 0L
+                                var bestDuration = 0L
+                                var worstDuration = 0L
+                                for (i in 0 until 100) {
+                                    statusMessage = "Run ${i + 1} of 100"
+
+                                    val startTime = System.currentTimeMillis()
+                                    proofBytes = generateNoirProof(
+                                        circuitFile,
+                                        srsFile,
+                                        circuitInputJson,
+                                        onChain,
+                                        vk,
+                                        lowMemoryMode,
+                                        circuit
+                                    )
+                                    val endTime = System.currentTimeMillis()
+                                    val duration = endTime - startTime
+                                    if ((bestDuration == 0L) || (duration < bestDuration)) bestDuration = duration
+                                    if ((worstDuration == 0L) || (worstDuration < duration)) worstDuration = duration
+                                    totalDuration += duration
+                                    println("Run ${i + 1} of 100 proving time: $duration ms")
+                                }
+                                val averageDuration = totalDuration / 100
+                                provingTime = "Proving time: $averageDuration ms (average of 100 runs)"
+                                println("Proving time: $averageDuration ms (average of 100 runs)")
+                                println("Best proving time: $bestDuration ms (average of 100 runs)")
+                                println("Worst proving time: $worstDuration ms (average of 100 runs)")
+                                statusMessage = "Proof generation completed"
+                            } catch (e: Exception) {
+                                provingTime = "Benchmarking failed"
+                                proofResult = "Error: ${e.message}"
+                                statusMessage = "Benchmarking proof generation failed"
+                                e.printStackTrace()
+                            } finally {
+                                isGeneratingProof = false
+                            }
+                        }
+                    ).start()
+                },
+                modifier = Modifier.padding(top = 20.dp).testTag("ageVerificationBenchmarkProofButton"),
+                enabled = !isGeneratingProof && !isVerifyingProof
+            ) { 
+                Text(text = "Benchmark Proof Generation")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -793,6 +994,73 @@ fun NonRevocationComponent() {
                 enabled = !isGeneratingProof && !isVerifyingProof
             ) {
                 Text(text = "Generate Proof")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    isGeneratingProof = true
+                    provingTime = ""
+                    proofResult = ""
+                    statusMessage = "Generating proof... This may take some time"
+
+                    Thread(
+                        Runnable {
+                            try {
+                                val onChain = true  // Use Keccak for Solidity compatibility
+                                val lowMemoryMode = false
+                                val circuit = "NonRevocation"
+
+                                statusMessage = "Generating verification key..."
+                                val vk = getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
+                                verificationKey = vk
+
+                                statusMessage = "Benchmarking proof generation with verification key..."
+                                var totalDuration = 0L
+                                var bestDuration = 0L
+                                var worstDuration = 0L
+                                for (i in 0 until 100) {
+                                    statusMessage = "Run ${i + 1} of 100"
+
+                                    val startTime = System.currentTimeMillis()
+                                    proofBytes = generateNoirProof(
+                                        circuitFile,
+                                        srsFile,
+                                        circuitInputJson,
+                                        onChain,
+                                        vk,
+                                        lowMemoryMode,
+                                        circuit
+                                    )
+                                    val endTime = System.currentTimeMillis()
+                                    val duration = endTime - startTime
+                                    if ((bestDuration == 0L) || (duration < bestDuration)) bestDuration = duration
+                                    if ((worstDuration == 0L) || (worstDuration < duration)) worstDuration = duration
+                                    totalDuration += duration
+                                    println("Run ${i + 1} of 100 proving time: $duration ms")
+                                }
+                                val averageDuration = totalDuration / 100
+                                provingTime = "Proving time: $averageDuration ms (average of 100 runs)"
+                                println("Proving time: $averageDuration ms (average of 100 runs)")
+                                println("Best proving time: $bestDuration ms (average of 100 runs)")
+                                println("Worst proving time: $worstDuration ms (average of 100 runs)")
+                                statusMessage = "Proof generation completed"
+                            } catch (e: Exception) {
+                                provingTime = "Benchmarking failed"
+                                proofResult = "Error: ${e.message}"
+                                statusMessage = "Benchmarking proof generation failed"
+                                e.printStackTrace()
+                            } finally {
+                                isGeneratingProof = false
+                            }
+                        }
+                    ).start()
+                },
+                modifier = Modifier.padding(top = 20.dp).testTag("nonRevocationBenchmarkProofButton"),
+                enabled = !isGeneratingProof && !isVerifyingProof
+            ) { 
+                Text(text = "Benchmark Proof Generation")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -1026,6 +1294,73 @@ fun FullProofComponent() {
                 enabled = !isGeneratingProof && !isVerifyingProof
             ) {
                 Text(text = "Generate Proof")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    isGeneratingProof = true
+                    provingTime = ""
+                    proofResult = ""
+                    statusMessage = "Generating proof... This may take some time"
+
+                    Thread(
+                        Runnable {
+                            try {
+                                val onChain = true  // Use Keccak for Solidity compatibility
+                                val lowMemoryMode = false
+                                val circuit = "FullProof"
+
+                                statusMessage = "Generating verification key..."
+                                val vk = getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
+                                verificationKey = vk
+
+                                statusMessage = "Benchmarking proof generation with verification key..."
+                                var totalDuration = 0L
+                                var bestDuration = 0L
+                                var worstDuration = 0L
+                                for (i in 0 until 100) {
+                                    statusMessage = "Run ${i + 1} of 100"
+
+                                    val startTime = System.currentTimeMillis()
+                                    proofBytes = generateNoirProof(
+                                        circuitFile,
+                                        srsFile,
+                                        circuitInputJson,
+                                        onChain,
+                                        vk,
+                                        lowMemoryMode,
+                                        circuit
+                                    )
+                                    val endTime = System.currentTimeMillis()
+                                    val duration = endTime - startTime
+                                    if ((bestDuration == 0L) || (duration < bestDuration)) bestDuration = duration
+                                    if ((worstDuration == 0L) || (worstDuration < duration)) worstDuration = duration
+                                    totalDuration += duration
+                                    println("Run ${i + 1} of 100 proving time: $duration ms")
+                                }
+                                val averageDuration = totalDuration / 100
+                                provingTime = "Proving time: $averageDuration ms (average of 100 runs)"
+                                println("Proving time: $averageDuration ms (average of 100 runs)")
+                                println("Best proving time: $bestDuration ms (average of 100 runs)")
+                                println("Worst proving time: $worstDuration ms (average of 100 runs)")
+                                statusMessage = "Proof generation completed"
+                            } catch (e: Exception) {
+                                provingTime = "Benchmarking failed"
+                                proofResult = "Error: ${e.message}"
+                                statusMessage = "Benchmarking proof generation failed"
+                                e.printStackTrace()
+                            } finally {
+                                isGeneratingProof = false
+                            }
+                        }
+                    ).start()
+                },
+                modifier = Modifier.padding(top = 20.dp).testTag("fullProofBenchmarkProofButton"),
+                enabled = !isGeneratingProof && !isVerifyingProof
+            ) { 
+                Text(text = "Benchmark Proof Generation")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
