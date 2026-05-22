@@ -1,5 +1,13 @@
 /target
 test-vectors/noir/noir_c03_holder_binding.srs
+test-vectors/noir/noir_c04_issuer_signature.srs
+test-vectors/noir/noir_c05_age_verification.srs
+test-vectors/noir/noir_c06_non_revocation.srs
+test-vectors/noir/noir_c09_full_proof.srs
 android/app/src/main/assets/noir_c03_holder_binding.srs
+android/app/src/main/assets/noir_c04_issuer_signature.srs
+android/app/src/main/assets/noir_c05_age_verification.srs
+android/app/src/main/assets/noir_c06_non_revocation.srs
+android/app/src/main/assets/noir_c09_full_proof.srs
 build/
 .idea/

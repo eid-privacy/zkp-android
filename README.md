@@ -46,7 +46,15 @@ mopro update
 cd zkp-pocs/noir/;
 make
 cp c03_holder_binding/target/c03_holder_binding.json ../../zkp-android/test-vectors/noir/noir_c03_holder_binding.json
-cp proofs/c03_holder_binding/vk ../../zkp-android/test-vectors/noir/noir_c03_holder_binding.vk
+cp c03_holder_binding/target/c03_holder_binding.json ../../zkp-android/android/app/src/main/assets/noir_c03_holder_binding.json
+cp c04_issuer_signature/target/c04_issuer_signature.json ../../zkp-android/test-vectors/noir/noir_c04_issuer_signature.json
+cp c04_issuer_signature/target/c04_issuer_signature.json ../../zkp-android/android/app/src/main/assets/noir_c04_issuer_signature.json
+cp c05_age_verification/target/c05_age_verification.json ../../zkp-android/test-vectors/noir/noir_c05_age_verification.json
+cp c05_age_verification/target/c05_age_verification.json ../../zkp-android/android/app/src/main/assets/noir_c05_age_verification.json
+cp c06_non_revocation/target/c06_non_revocation.json ../../zkp-android/test-vectors/noir/noir_c06_non_revocation.json
+cp c06_non_revocation/target/c06_non_revocation.json ../../zkp-android/android/app/src/main/assets/noir_c06_non_revocation.json
+cp c09_full_proof/target/c09_full_proof.json ../../zkp-android/test-vectors/noir/noir_c09_full_proof.json
+cp c09_full_proof/target/c09_full_proof.json ../../zkp-android/android/app/src/main/assets/noir_c09_full_proof.json
 ```
 
 ```sh
@@ -64,6 +72,15 @@ Specific circuit:
 
 ```sh
 cargo run --bin srs_downloader --features srs-downloader -- -c ../zkp-android/test-vectors/noir/noir_c03_holder_binding.json -o ../zkp-android/test-vectors/noir/noir_c03_holder_binding.srs
+cp ../zkp-android/test-vectors/noir/noir_c03_holder_binding.srs ../../zkp-android/android/app/src/main/assets/noir_c03_holder_binding.srs
+cargo run --bin srs_downloader --features srs-downloader -- -c ../zkp-android/test-vectors/noir/noir_c04_issuer_signature.json -o ../zkp-android/test-vectors/noir/noir_c04_issuer_signature.srs
+cp ../zkp-android/test-vectors/noir/noir_c04_issuer_signature.srs ../../zkp-android/android/app/src/main/assets/noir_c04_issuer_signature.srs
+cargo run --bin srs_downloader --features srs-downloader -- -c ../zkp-android/test-vectors/noir/noir_c05_age_verification.json -o ../zkp-android/test-vectors/noir/noir_c05_age_verification.srs
+cp ../zkp-android/test-vectors/noir/noir_c05_age_verification.srs ../../zkp-android/android/app/src/main/assets/noir_c05_age_verification.srs
+cargo run --bin srs_downloader --features srs-downloader -- -c ../zkp-android/test-vectors/noir/noir_c06_non_revocation.json -o ../zkp-android/test-vectors/noir/noir_c06_non_revocation.srs
+cp ../zkp-android/test-vectors/noir/noir_c06_non_revocation.srs ../../zkp-android/android/app/src/main/assets/noir_c06_non_revocation.srs
+cargo run --bin srs_downloader --features srs-downloader -- -c ../zkp-android/test-vectors/noir/noir_c09_full_proof.json -o ../zkp-android/test-vectors/noir/noir_c09_full_proof.srs
+cp ../zkp-android/test-vectors/noir/noir_c09_full_proof.srs ../../zkp-android/android/app/src/main/assets/noir_c09_full_proof.srs
 ```
 
 ## Test
