@@ -2,7 +2,7 @@
 
 ## Overview
 
-`zkp-android` is an Android application that demonstrates Zero-Knowledge Proof (ZKP) generation and verification across multiple proof systems (Circom, Halo2, and Noir). The project is built with the `mopro` toolchain, which generates cross-platform bindings from Rust source code to Kotlin (Android) via UniFFI and JNA.
+`zkp-android` is an Android application that demonstrates Noir Zero-Knowledge Proof (ZKP) generation and verification. The project is built with the `mopro` toolchain, which generates cross-platform bindings from Rust source code to Kotlin (Android) via UniFFI and JNA.
 
 ## Prerequisites
 
