@@ -55,6 +55,7 @@ cp c06_non_revocation/target/c06_non_revocation.json ../../zkp-android/test-vect
 cp c06_non_revocation/target/c06_non_revocation.json ../../zkp-android/android/app/src/main/assets/noir_c06_non_revocation.json
 cp c09_full_proof/target/c09_full_proof.json ../../zkp-android/test-vectors/noir/noir_c09_full_proof.json
 cp c09_full_proof/target/c09_full_proof.json ../../zkp-android/android/app/src/main/assets/noir_c09_full_proof.json
+cp d10_swiyu_jwt/target/d10_swiyu_jwt.json ../../zkp-android/test-vectors/noir/noir_d10_swiyu_jwt.json
 ```
 
 ```sh
@@ -81,6 +82,7 @@ cargo run --bin srs_downloader --features srs-downloader -- -c ../zkp-android/te
 cp ../zkp-android/test-vectors/noir/noir_c06_non_revocation.srs ../../zkp-android/android/app/src/main/assets/noir_c06_non_revocation.srs
 cargo run --bin srs_downloader --features srs-downloader -- -c ../zkp-android/test-vectors/noir/noir_c09_full_proof.json -o ../zkp-android/test-vectors/noir/noir_c09_full_proof.srs
 cp ../zkp-android/test-vectors/noir/noir_c09_full_proof.srs ../../zkp-android/android/app/src/main/assets/noir_c09_full_proof.srs
+cargo run --bin srs_downloader --features srs-downloader -- -c ../zkp-android/test-vectors/noir/noir_d10_swiyu_jwt.json -o ../zkp-android/test-vectors/noir/noir_d10_swiyu_jwt.srs
 ```
 
 ## Test

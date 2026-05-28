@@ -233,6 +233,7 @@ fn get_circuit_abi(circuit: &str) -> Result<Abi, String> {
         "AgeVerification" => Ok(get_age_verification_abi()),
         "NonRevocation" => Ok(get_non_revocation_abi()),
         "FullProof" => Ok(get_full_proof_abi()),
+        "SwiyuJwt" => Ok(get_swiyu_jwt_abi()),
         _ => Err(format!("unknown circuit type: {circuit}")),
     }
 }
@@ -398,6 +399,121 @@ pub fn get_full_proof_abi() -> Abi {
     }
 }
 
+pub fn get_swiyu_jwt_abi() -> Abi {
+    let parameters = vec![
+        AbiParameter {
+            name: "payload".to_string(),
+            typ: AbiType::Struct {
+                path: "std::collections::bounded_vec::BoundedVec".to_string(),
+                fields: vec![
+                    (
+                        "storage".to_string(),
+                        AbiType::Array {
+                            length: 2048,
+                            typ: Box::new(AbiType::Integer { sign: Sign::Unsigned, width: 8 }),
+                        },
+                    ),
+                    (
+                        "len".to_string(),
+                        AbiType::Integer { sign: Sign::Unsigned, width: 32 },
+                    ),
+                ],
+            },
+            visibility: AbiVisibility::Private,
+        },
+        AbiParameter {
+            name: "jwt_signature".to_string(),
+            typ: AbiType::Array { length: 64, typ: Box::new(AbiType::Integer { sign: Sign::Unsigned, width: 8 })},
+            visibility: AbiVisibility::Private,
+        },
+        AbiParameter {
+            name: "dob_salt".to_string(),
+            typ: AbiType::Struct {
+                path: "std::collections::bounded_vec::BoundedVec".to_string(),
+                fields: vec![
+                    (
+                        "storage".to_string(),
+                        AbiType::Array {
+                            length: 32,
+                            typ: Box::new(AbiType::Integer { sign: Sign::Unsigned, width: 8 }),
+                        },
+                    ),
+                    (
+                        "len".to_string(),
+                        AbiType::Integer { sign: Sign::Unsigned, width: 32 },
+                    ),
+                ],
+            },
+            visibility: AbiVisibility::Private,
+        },
+        AbiParameter {
+            name: "dob_value".to_string(),
+            typ: AbiType::Struct {
+                path: "std::collections::bounded_vec::BoundedVec".to_string(),
+                fields: vec![
+                    (
+                        "storage".to_string(),
+                        AbiType::Array {
+                            length: 16,
+                            typ: Box::new(AbiType::Integer { sign: Sign::Unsigned, width: 8 }),
+                        },
+                    ),
+                    (
+                        "len".to_string(),
+                        AbiType::Integer { sign: Sign::Unsigned, width: 32 },
+                    ),
+                ],
+            },
+            visibility: AbiVisibility::Private,
+        },
+        AbiParameter {
+            name: "dob_sd_offset".to_string(),
+            typ: AbiType::Integer { sign: Sign::Unsigned, width: 32 },
+            visibility: AbiVisibility::Private,
+        },
+        AbiParameter {
+            name: "x_offset".to_string(),
+            typ: AbiType::Integer { sign: Sign::Unsigned, width: 32 },
+            visibility: AbiVisibility::Private,
+        },
+        AbiParameter {
+            name: "y_offset".to_string(),
+            typ: AbiType::Integer { sign: Sign::Unsigned, width: 32 },
+            visibility: AbiVisibility::Private,
+        },
+        AbiParameter {
+            name: "device_signature".to_string(),
+            typ: AbiType::Array { length: 64, typ: Box::new(AbiType::Integer { sign: Sign::Unsigned, width: 8})},
+            visibility: AbiVisibility::Private,
+        },
+        AbiParameter {
+            name: "issuer_pub_x".to_string(),
+            typ: AbiType::Array { length: 32, typ: Box::new(AbiType::Integer { sign: Sign::Unsigned, width: 8})},
+            visibility: AbiVisibility::Public,
+        },
+        AbiParameter {
+            name: "issuer_pub_y".to_string(),
+            typ: AbiType::Array { length: 32, typ: Box::new(AbiType::Integer { sign: Sign::Unsigned, width: 8})},
+            visibility: AbiVisibility::Public,
+        },
+        AbiParameter {
+            name: "now_date".to_string(),
+            typ: AbiType::Integer { sign: Sign::Unsigned, width: 32},
+            visibility: AbiVisibility::Public,
+        },
+        AbiParameter {
+            name: "challenge_nonce".to_string(),
+            typ: AbiType::Array { length: 32, typ: Box::new(AbiType::Integer { sign: Sign::Unsigned, width: 8})},
+            visibility: AbiVisibility::Public,
+        },
+    ];
+    Abi {
+        parameters,
+        return_type: None,
+        error_types: Default::default(),
+    }
+}
+
 pub fn build_witness(
     input: &str,
     abi: Abi
@@ -426,6 +542,9 @@ mod tests {
     const NON_REVOCATION_SRS_FILE: &str = concat!(TEST_VECTORS!(), "noir_c06_non_revocation.srs");
     const FULL_PROOF_CIRCUIT_FILE: &str = concat!(TEST_VECTORS!(), "noir_c09_full_proof.json");
     const FULL_PROOF_SRS_FILE: &str = concat!(TEST_VECTORS!(), "noir_c09_full_proof.srs");
+
+    const SWIYU_JWT_CIRCUIT_FILE: &str = concat!(TEST_VECTORS!(), "noir_d10_swiyu_jwt.json");
+    const SWIYU_JWT_SRS_FILE: &str = concat!(TEST_VECTORS!(), "noir_d10_swiyu_jwt.srs");
 
     // input
     // Prover_0
@@ -2563,4 +2682,390 @@ mod tests {
         assert!(verify_result_onchain.unwrap());
     }
 
+    #[test]
+    #[serial_test::serial]
+    fn test_proof_swiyu_jwt() {
+        let low_memory_mode = false;
+        let abi = get_swiyu_jwt_abi();
+        let input_json: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(concat!(TEST_VECTORS!(), "Prover.json"))
+                .expect("failed to read prover"),
+        )
+        .expect("failed to parse prover");
+        let witness = build_witness(&input_json.to_string(), abi).unwrap();
+        let vk = get_noir_verification_poseidon_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            low_memory_mode,
+        )
+        .unwrap();
+        let proof = generate_noir_proof_with_poseidon(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            witness,
+            vk.clone(),
+            low_memory_mode,
+            )
+            .unwrap();
+        assert!(verify_noir_proof_with_poseidon(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            proof,
+            vk,
+            low_memory_mode,
+        ));
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_proof_swiyu_jwt_low_memory() {
+        let low_memory_mode = true;
+        let abi = get_swiyu_jwt_abi();
+        let input_json: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(concat!(TEST_VECTORS!(), "Prover.json"))
+                .expect("failed to read prover"),
+        )
+        .expect("failed to parse prover");
+        let witness = build_witness(&input_json.to_string(), abi).unwrap();
+        let vk = get_noir_verification_poseidon_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            low_memory_mode,
+        )
+        .unwrap();
+        let proof = generate_noir_proof_with_poseidon(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            witness,
+            vk.clone(),
+            low_memory_mode,
+            )
+            .unwrap();
+        assert!(verify_noir_proof_with_poseidon(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            proof,
+            vk,
+            low_memory_mode,
+        ));
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_proof_swiyu_jwt_without_srs_path() {
+        let low_memory_mode = false;
+        let abi = get_swiyu_jwt_abi();
+        let input_json: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(concat!(TEST_VECTORS!(), "Prover.json"))
+                .expect("failed to read prover"),
+        )
+        .expect("failed to parse prover");
+        let witness = build_witness(&input_json.to_string(), abi).unwrap();
+        let vk = get_noir_verification_poseidon_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            None,
+            low_memory_mode,
+        )
+        .unwrap();
+        let proof = generate_noir_proof_with_poseidon(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            None,
+            witness,
+            vk.clone(),
+            low_memory_mode,
+            )
+            .unwrap();
+        assert!(verify_noir_proof_with_poseidon(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            proof,
+            vk,
+            low_memory_mode,
+        ));
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_keccak_proof_swiyu_jwt() {
+        let low_memory_mode = false;
+        let disable_zk = false;
+        let abi = get_swiyu_jwt_abi();
+        let input_json: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(concat!(TEST_VECTORS!(), "Prover.json"))
+                .expect("failed to read prover"),
+        )
+        .expect("failed to parse prover");
+        let witness = build_witness(&input_json.to_string(), abi).unwrap();
+        let vk = get_noir_verification_keccak_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            disable_zk,
+            low_memory_mode,
+        )
+        .unwrap();
+        let proof = generate_noir_proof_with_keccak(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            witness,
+            disable_zk,
+            vk.clone(),
+            low_memory_mode,
+        )
+        .unwrap();
+        assert!(verify_noir_proof_with_keccak(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            proof,
+            disable_zk,
+            vk,
+            low_memory_mode,
+        ));
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_keccak_proof_swiyu_jwt_disable_zk() {
+        let low_memory_mode = false;
+        let disable_zk = true;
+        let abi = get_swiyu_jwt_abi();
+        let input_json: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(concat!(TEST_VECTORS!(), "Prover.json"))
+                .expect("failed to read prover"),
+        )
+        .expect("failed to parse prover");
+        let witness = build_witness(&input_json.to_string(), abi).unwrap();
+        let vk = get_noir_verification_keccak_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            disable_zk,
+            low_memory_mode,
+        )
+        .unwrap();
+        let proof = generate_noir_proof_with_keccak(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            witness,
+            disable_zk,
+            vk.clone(),
+            low_memory_mode,
+        )
+        .unwrap();
+        assert!(verify_noir_proof_with_keccak(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            proof,
+            disable_zk,
+            vk,
+            low_memory_mode,
+        ));
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_keccak_proof_swiyu_jwt_low_memory() {
+        let low_memory_mode = true;
+        let disable_zk = false;
+        let abi = get_swiyu_jwt_abi();
+        let input_json: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(concat!(TEST_VECTORS!(), "Prover.json"))
+                .expect("failed to read prover"),
+        )
+        .expect("failed to parse prover");
+        let witness = build_witness(&input_json.to_string(), abi).unwrap();
+        let vk = get_noir_verification_keccak_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            disable_zk,
+            low_memory_mode,
+        )
+        .unwrap();
+        let proof = generate_noir_proof_with_keccak(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            witness,
+            disable_zk,
+            vk.clone(),
+            low_memory_mode,
+        )
+        .unwrap();
+        assert!(verify_noir_proof_with_keccak(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            proof,
+            disable_zk,
+            vk,
+            low_memory_mode,
+        ));
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_get_swiyu_jwt_verification_poseidon_key() {
+        let vk = get_noir_verification_poseidon_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            false,
+        );
+        assert!(vk.is_ok());
+        assert!(!vk.unwrap().is_empty());
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_high_level_noir_proof_swiyu_jwt_poseidon() {
+        let on_chain = false;
+        let low_memory_mode = false;
+        let input_json: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(concat!(TEST_VECTORS!(), "Prover.json"))
+                .expect("failed to read prover"),
+        )
+        .expect("failed to parse prover");
+        let vk = get_noir_verification_poseidon_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            false,
+        )
+        .unwrap();
+        let proof = generate_noir_proof(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            &input_json.to_string(),
+            on_chain,
+            vk.clone(),
+            low_memory_mode,
+            "SwiyuJwt",
+        )
+        .unwrap();
+        let is_valid = verify_noir_proof(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            proof,
+            on_chain,
+            vk,
+            low_memory_mode,
+        )
+        .unwrap();
+        assert!(is_valid);
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_high_level_noir_proof_swiyu_jwt_keccak() {
+        let on_chain = true;
+        let low_memory_mode = false;
+        let disable_zk = false;
+        let input_json: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(concat!(TEST_VECTORS!(), "Prover.json"))
+                .expect("failed to read prover"),
+        )
+        .expect("failed to parse prover");
+        let vk = get_noir_verification_keccak_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            disable_zk,
+            low_memory_mode,
+        )
+        .unwrap();
+        let proof = generate_noir_proof(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            &input_json.to_string(),
+            on_chain,
+            vk.clone(),
+            low_memory_mode,
+            "SwiyuJwt",
+        )
+        .unwrap();
+        let is_valid =
+            verify_noir_proof(SWIYU_JWT_CIRCUIT_FILE.to_string(), proof, on_chain, vk, low_memory_mode)
+                .unwrap();
+        assert!(is_valid);
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_get_noir_verification_key_swiyu_jwt_poseidon() {
+        let vk = get_noir_verification_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            false, // off-chain, uses Poseidon
+            false,
+        );
+        assert!(vk.is_ok());
+        assert!(!vk.unwrap().is_empty());
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_get_noir_verification_key_swiyu_jwt_keccak() {
+        let vk = get_noir_verification_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            true, // on-chain, uses Keccak
+            false,
+        );
+        assert!(vk.is_ok());
+        assert!(!vk.unwrap().is_empty());
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_noir_app_macro_swiyu_jwt() {
+        let low_memory_mode = false;
+        let vk_offchain = get_noir_verification_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            false,
+            low_memory_mode,
+        )
+        .unwrap();
+        let vk_onchain = get_noir_verification_key(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            true,
+            low_memory_mode,
+        )
+        .unwrap();
+        let input_json: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(concat!(TEST_VECTORS!(), "Prover.json"))
+                .expect("failed to read prover"),
+        )
+        .expect("failed to parse prover");
+        let proof_offchain = generate_noir_proof(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            &input_json.to_string(),
+            false,
+            vk_offchain.clone(),
+            low_memory_mode,
+            "SwiyuJwt",
+        );
+        let proof_onchain = generate_noir_proof(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            Some(SWIYU_JWT_SRS_FILE.to_string()),
+            &input_json.to_string(),
+            true,
+            vk_onchain.clone(),
+            low_memory_mode,
+            "SwiyuJwt",
+        );
+
+        assert!(proof_offchain.is_ok());
+        assert!(proof_onchain.is_ok());
+        let proof_offchain = proof_offchain.unwrap();
+        let proof_onchain = proof_onchain.unwrap();
+
+        let verify_result_offchain = verify_noir_proof(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            proof_offchain.clone(),
+            false,
+            vk_offchain,
+            low_memory_mode,
+        );
+        let verify_result_onchain = verify_noir_proof(
+            SWIYU_JWT_CIRCUIT_FILE.to_string(),
+            proof_onchain.clone(),
+            true,
+            vk_onchain,
+            low_memory_mode,
+        );
+
+        assert!(verify_result_offchain.is_ok());
+        assert!(verify_result_offchain.unwrap());
+        assert!(verify_result_onchain.is_ok());
+        assert!(verify_result_onchain.unwrap());
+    }
 }
