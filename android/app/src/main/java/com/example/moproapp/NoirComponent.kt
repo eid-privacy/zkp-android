@@ -1172,6 +1172,278 @@ fun NonRevocationComponent() {
 }
 
 @Composable
+fun SwiyuJwtComponent() {
+    val context = LocalContext.current
+    var provingTime by remember { mutableStateOf("") }
+    var proofResult by remember { mutableStateOf("") }
+    var verificationTime by remember { mutableStateOf("") }
+    var verificationResult by remember { mutableStateOf("") }
+    var proofBytes by remember { mutableStateOf<ByteArray?>(null) }
+    var verificationKey by remember { mutableStateOf<ByteArray?>(null) }
+
+    var isGeneratingProof by remember { mutableStateOf(false) }
+    var isVerifyingProof by remember { mutableStateOf(false) }
+    var statusMessage by remember { mutableStateOf("Ready to generate proof") }
+
+    val circuitFile = getFilePathFromAssets("noir_d10_swiyu_jwt.json")
+    val srsFile = getFilePathFromAssets("noir_d10_swiyu_jwt.srs")
+    val proverFile = getFilePathFromAssets("Prover.json")
+
+    val circuitInputJson = remember {
+        File(proverFile).readText()
+    }
+
+    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Noir Swiyu JWT",
+                modifier = Modifier.padding(bottom = 20.dp),
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp
+            )
+
+            Text(
+                text = statusMessage,
+                modifier = Modifier.padding(bottom = 24.dp),
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                fontWeight = if (isGeneratingProof || isVerifyingProof) FontWeight.Bold else FontWeight.Normal
+            )
+
+            if (isGeneratingProof || isVerifyingProof) {
+                CircularProgressIndicator(
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
+
+            Button(
+                onClick = {
+                    isGeneratingProof = true
+                    provingTime = ""
+                    proofResult = ""
+                    statusMessage = "Generating proof... This may take some time"
+
+                    Thread(
+                        Runnable {
+                            try {
+                                val onChain = true
+                                val lowMemoryMode = false
+                                val circuit = "SwiyuJwt"
+
+                                statusMessage = "Generating verification key..."
+                                val vk = getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
+                                verificationKey = vk
+
+                                statusMessage = "Generating proof with verification key..."
+                                val startTime = System.currentTimeMillis()
+                                proofBytes = generateNoirProof(
+                                    circuitFile,
+                                    srsFile,
+                                    circuitInputJson,
+                                    onChain,
+                                    vk,
+                                    lowMemoryMode,
+                                    circuit
+                                )
+                                val endTime = System.currentTimeMillis()
+                                val duration = endTime - startTime
+
+                                provingTime = "Proving time: $duration ms"
+                                proofResult = "Proof generated: ${proofBytes?.size ?: 0} bytes"
+                                statusMessage = "Proof generation completed"
+                            } catch (e: Exception) {
+                                provingTime = "Proving failed"
+                                proofResult = "Error: ${e.message}"
+                                statusMessage = "Proof generation failed"
+                                e.printStackTrace()
+                            } finally {
+                                isGeneratingProof = false
+                            }
+                        }
+                    ).start()
+                },
+                modifier = Modifier.padding(top = 20.dp).testTag("swiyuJwtGenerateProofButton"),
+                enabled = !isGeneratingProof && !isVerifyingProof
+            ) {
+                Text(text = "Generate Proof")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    isGeneratingProof = true
+                    provingTime = ""
+                    proofResult = ""
+                    statusMessage = "Generating proof... This may take some time"
+
+                    Thread(
+                        Runnable {
+                            try {
+                                val onChain = true
+                                val lowMemoryMode = false
+                                val circuit = "SwiyuJwt"
+
+                                statusMessage = "Generating verification key..."
+                                val vk = getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
+                                verificationKey = vk
+
+                                statusMessage = "Benchmarking proof generation with verification key..."
+                                var totalDuration = 0L
+                                var bestDuration = 0L
+                                var worstDuration = 0L
+                                for (i in 0 until 100) {
+                                    statusMessage = "Run ${i + 1} of 100"
+
+                                    val startTime = System.currentTimeMillis()
+                                    proofBytes = generateNoirProof(
+                                        circuitFile,
+                                        srsFile,
+                                        circuitInputJson,
+                                        onChain,
+                                        vk,
+                                        lowMemoryMode,
+                                        circuit
+                                    )
+                                    val endTime = System.currentTimeMillis()
+                                    val duration = endTime - startTime
+                                    if ((bestDuration == 0L) || (duration < bestDuration)) bestDuration = duration
+                                    if ((worstDuration == 0L) || (worstDuration < duration)) worstDuration = duration
+                                    totalDuration += duration
+                                    println("Run ${i + 1} of 100 proving time: $duration ms")
+                                }
+                                val averageDuration = totalDuration / 100
+                                provingTime = "Proving time: $averageDuration ms (average of 100 runs)"
+                                println("Proving time: $averageDuration ms (average of 100 runs)")
+                                println("Best proving time: $bestDuration ms (average of 100 runs)")
+                                println("Worst proving time: $worstDuration ms (average of 100 runs)")
+                                statusMessage = "Proof generation completed"
+                            } catch (e: Exception) {
+                                provingTime = "Benchmarking failed"
+                                proofResult = "Error: ${e.message}"
+                                statusMessage = "Benchmarking proof generation failed"
+                                e.printStackTrace()
+                            } finally {
+                                isGeneratingProof = false
+                            }
+                        }
+                    ).start()
+                },
+                modifier = Modifier.padding(top = 20.dp).testTag("swiyuJwtBenchmarkProofButton"),
+                enabled = !isGeneratingProof && !isVerifyingProof
+            ) {
+                Text(text = "Benchmark Proof Generation")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    isVerifyingProof = true
+                    verificationTime = ""
+                    verificationResult = ""
+                    statusMessage = "Verifying proof..."
+
+                    Thread(
+                        Runnable {
+                            try {
+                                proofBytes?.let { proof ->
+                                    verificationKey?.let { vk ->
+                                        val onChain = true
+                                        val lowMemoryMode = false
+
+                                        val startTime = System.currentTimeMillis()
+                                        val result = verifyNoirProof(
+                                            circuitFile,
+                                            proof,
+                                            onChain,
+                                            vk,
+                                            lowMemoryMode
+                                        )
+                                        val endTime = System.currentTimeMillis()
+                                        val duration = endTime - startTime
+
+                                        verificationTime = "Verification time: $duration ms"
+                                        verificationResult = "Verification result: $result"
+                                        if (result)
+                                            statusMessage = "Proof verified successfully!"
+                                        else
+                                            statusMessage = "Proof verification failed!"
+                                    } ?: run {
+                                        verificationResult = "No verification key available"
+                                        statusMessage = "Please generate a proof first to get verification key"
+                                    }
+                                } ?: run {
+                                    verificationResult = "No proof available"
+                                    statusMessage = "Please generate a proof first"
+                                }
+                            } catch (e: Exception) {
+                                verificationTime = "Verification failed"
+                                verificationResult = "Error: ${e.message}"
+                                statusMessage = "Proof verification error"
+                                e.printStackTrace()
+                            } finally {
+                                isVerifyingProof = false
+                            }
+                        }
+                    ).start()
+                },
+                modifier = Modifier.padding(top = 20.dp).testTag("swiyuJwtVerifyProofButton"),
+                enabled = !isGeneratingProof && !isVerifyingProof && proofBytes != null
+            ) {
+                Text(text = "Verify Proof")
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            if (provingTime.isNotEmpty() || proofResult.isNotEmpty() ||
+                verificationTime.isNotEmpty() || verificationResult.isNotEmpty()) {
+
+                Text(
+                    text = "Results",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                if (provingTime.isNotEmpty()) {
+                    Text(
+                        text = provingTime,
+                        modifier = Modifier.padding(top = 4.dp).width(280.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                if (proofResult.isNotEmpty()) {
+                    Text(
+                        text = proofResult,
+                        modifier = Modifier.padding(top = 4.dp).width(280.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                if (verificationTime.isNotEmpty()) {
+                    Text(
+                        text = verificationTime,
+                        modifier = Modifier.padding(top = 4.dp).width(280.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                if (verificationResult.isNotEmpty()) {
+                    Text(
+                        text = verificationResult,
+                        modifier = Modifier.padding(top = 4.dp).width(280.dp),
+                        textAlign = TextAlign.Center,
+                        fontWeight = if (verificationResult.contains("true")) FontWeight.Bold else FontWeight.Normal
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun FullProofComponent() {
     val context = LocalContext.current
     var provingTime by remember { mutableStateOf("") }

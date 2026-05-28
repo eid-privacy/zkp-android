@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("HolderBinding", "IssuerSignature", "AgeVerification", "NonRevocation", "FullProof")
+    val tabs = listOf("HolderBinding", "IssuerSignature", "AgeVerification", "NonRevocation", "FullProof", "SwiyuJwt")
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(modifier = Modifier
@@ -74,6 +74,7 @@ fun MainScreen() {
                 2 -> AgeVerificationComponent()
                 3 -> NonRevocationComponent()
                 4 -> FullProofComponent()
+                5 -> SwiyuJwtComponent()
             }
         }
     }

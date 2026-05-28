@@ -153,4 +153,17 @@ class ExampleInstrumentedTest {
         composeTestRule.onNodeWithTag("fullProofVerifyProofButton").performClick()
         composeTestRule.onNodeWithTag("fullProofVerifyProofButton").assertIsDisplayed()
     }
+
+    @Test
+    fun swiyuJwtButtonClick() {
+        composeTestRule.setContent { SwiyuJwtComponent() }
+
+        composeTestRule.onNodeWithTag("swiyuJwtGenerateProofButton").performClick()
+        composeTestRule.onNodeWithTag("swiyuJwtGenerateProofButton").assertIsDisplayed()
+
+        waitForProofCompletion("swiyuJwtVerifyProofButton", maxWaitSeconds = 10)
+
+        composeTestRule.onNodeWithTag("swiyuJwtVerifyProofButton").performClick()
+        composeTestRule.onNodeWithTag("swiyuJwtVerifyProofButton").assertIsDisplayed()
+    }
 }
