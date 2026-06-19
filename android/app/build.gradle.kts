@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.moproapp"
+    namespace = "ch.epfl.swiyuzkp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.moproapp"
+        applicationId = "ch.epfl.swiyuzkp"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -68,6 +68,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Uniffi
-    implementation("net.java.dev.jna:jna:5.13.0@aar")
+    implementation("net.java.dev.jna:jna:5.17.0@aar")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 }
