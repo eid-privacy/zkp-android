@@ -20,6 +20,18 @@ bindings:
 devbox run setup   # equivalent to: make setup
 ```
 
+Download the SRS for each circuit and copy it into the Android assets:
+
+> [!IMPORTANT]
+> The app **will not work without this step**. Proof generation and verification
+> require the structured reference string (SRS) for each circuit. The SRS files
+> are large and are **not** committed to git, so you must download them yourself
+> before running the app.
+
+```sh
+devbox run download-srs   # equivalent to: make download-srs
+```
+
 Finally, open the Android project in Android Studio:
 
 ```sh
@@ -54,15 +66,6 @@ This initializes the submodule, runs `devbox run circuits` inside `zkp-pocs`
 > inputs are hard-coded in the Android code, so a regenerated circuit no longer
 > matches them. You must update the hard-coded inputs to match the new circuit
 > before proofs will succeed again.
-
-## Download the SRS
-
-Download the structured reference string (SRS) for each circuit and copy it into
-the Android assets:
-
-```sh
-devbox run download-srs   # equivalent to: make download-srs
-```
 
 ## Test
 

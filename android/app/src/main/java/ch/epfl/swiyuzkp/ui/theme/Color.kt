@@ -1,4 +1,4 @@
-package com.example.moproapp.ui.theme
+package ch.epfl.swiyuzkp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package com.example.moproapp
+package ch.epfl.swiyuzkp
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -47,49 +47,10 @@ class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.example.moproapp", appContext.packageName)
+        assertEquals("ch.epfl.swiyuzkp", appContext.packageName)
     }
 
     @Test
-    fun circomButtonClick() {
-        composeTestRule.setContent { MultiplierComponent() }
-        
-        composeTestRule.onNodeWithTag("circomGenerateProofButton").performClick()
-        composeTestRule.onNodeWithTag("circomGenerateProofButton").assertIsDisplayed()
-        
-        waitForProofCompletion("circomVerifyProofButton", maxWaitSeconds = 10)
-        
-        composeTestRule.onNodeWithTag("circomVerifyProofButton").performClick()
-        composeTestRule.onNodeWithTag("circomVerifyProofButton").assertIsDisplayed()
-    }
-
-    @Test
-    fun rapidsnarkButtonClick() {
-        composeTestRule.setContent { MultiplierComponent() }
-
-        composeTestRule.onNodeWithTag("rapidsnarkGenerateProofButton").performClick()
-        composeTestRule.onNodeWithTag("rapidsnarkGenerateProofButton").assertIsDisplayed()
-
-        waitForProofCompletion("rapidsnarkVerifyProofButton", maxWaitSeconds = 10)
-
-        composeTestRule.onNodeWithTag("rapidsnarkVerifyProofButton").performClick()
-        composeTestRule.onNodeWithTag("rapidsnarkVerifyProofButton").assertIsDisplayed()
-    }
-
-    @Test
-    fun halo2ButtonClick() {
-        composeTestRule.setContent { FibonacciComponent() }
-
-        composeTestRule.onNodeWithTag("halo2GenerateProofButton").performClick()
-        composeTestRule.onNodeWithTag("halo2GenerateProofButton").assertIsDisplayed()
-
-        waitForProofCompletion("halo2VerifyProofButton", maxWaitSeconds = 10)
-
-        composeTestRule.onNodeWithTag("halo2VerifyProofButton").performClick()
-        composeTestRule.onNodeWithTag("halo2VerifyProofButton").assertIsDisplayed()
-    }
-
-    @Test 
     fun HolderBindingButtonClick() {
         composeTestRule.setContent { HolderBindingComponent() }
 

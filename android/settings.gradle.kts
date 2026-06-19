@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MoproApp"
+rootProject.name = "SwiyuZKP"
 include(":app")

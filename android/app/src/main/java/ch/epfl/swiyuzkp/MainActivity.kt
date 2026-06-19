@@ -1,9 +1,12 @@
-package com.example.moproapp
+package ch.epfl.swiyuzkp
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -48,22 +51,33 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("HolderBinding", "IssuerSignature", "AgeVerification", "NonRevocation", "FullProof", "SwiyuJwt")
+    val tabs = listOf(
+        "Holder Binding",
+        "Issuer Signature",
+        "Age Verification",
+        "Non-Revocation",
+        "Full Proof",
+        "Swiyu JWT",
+    )
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
         ) {
-            TabRow(selectedTabIndex = selectedTab) {
+            FlowRow(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 tabs.forEachIndexed { index, title ->
-                    Tab(
-                        text = { Text(title) },
+                    FilterChip(
                         selected = selectedTab == index,
-                        onClick = { selectedTab = index }
+                        onClick = { selectedTab = index },
+                        label = { Text(title) }
                     )
                 }
             }
