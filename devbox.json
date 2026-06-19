@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.17.3/.schema/devbox.schema.json",
+  "packages": {
+    "rustup": "latest",
+    "libiconv": "latest",
+    "bzip2": {
+      "version": "latest",
+      "outputs": ["out", "dev"]
+    },
+    "xz": "latest"
+  },
+  "shell": {
+    "init_hook": [
+      "export CARGO_HOME=\"$PWD/.devbox/virtenv/cargo\"",
+      "export CARGO_TARGET_DIR=\"$PWD/target\"",
+      "export PATH=\"$CARGO_HOME/bin:$PATH\"",
+      "rustup default stable",
+      "cargo fetch"
+    ],
+    "scripts": {
+      "setup": [
+        "make setup"
+      ],
+      "circuits": [
+        "make circuits"
+      ],
+      "download-srs": [
+        "make download-srs"
+      ],
+      "test": [
+        "make test"
+      ]
+    }
+  }
+}

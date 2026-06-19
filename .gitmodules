@@ -1,0 +1,4 @@
+[submodule "zkp-pocs"]
+	path = zkp-pocs
+	url = git@github.com:eid-privacy/zkp-pocs.git
+	branch = android_mopro

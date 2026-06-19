@@ -11,7 +11,6 @@ use noir_rs::{
 };
 use noirc_abi::{Abi, AbiParameter, AbiType, AbiVisibility, Sign};
 use noirc_abi::input_parser::json::parse_json;
-use serde_json::{Value, json};
 
 use crate::MoproError;
 
