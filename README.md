@@ -4,6 +4,8 @@
 
 `zkp-android` is an Android application that demonstrates Noir Zero-Knowledge Proof (ZKP) generation and verification. The project is built with the `mopro` toolchain, which generates cross-platform bindings from Rust source code to Kotlin (Android) via UniFFI and JNA.
 
+<a href="./screenshot_swiyujwt.png"><img src="./screenshot_swiyujwt.png" alt="Running full SwiyuJWT verification" width="50%"></a>
+
 ## Set up
 
 All tooling is managed with [devbox](https://www.jetify.com/devbox) and the
